@@ -1,38 +1,29 @@
-HELP.md
-target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+/node_modules
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
+*.class
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
 
-### VS Code ###
-.vscode/
-/src/main/resources/database/library-db.mv.db
-/src/main/resources/database/library-db.trace.db
-/.mvn/wrapper/maven-wrapper.jar
-/.mvn/wrapper/maven-wrapper.properties
-/.mvn/wrapper/MavenWrapperDownloader.java
+#Build directory
+/build
+
+/build
+
+#Package Files
+*.jar
+
+*.war
+
+*.ear
+
+
+
+#Executable Files
+
+*.exe
+
+
+
+# Target directory
+
+/target

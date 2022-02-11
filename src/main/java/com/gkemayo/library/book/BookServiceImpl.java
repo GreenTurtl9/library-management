@@ -1,16 +1,17 @@
 package com.gkemayo.library.book;
 
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service("bookService")
 @Transactional
+@RequiredArgsConstructor
 public class BookServiceImpl implements IBookService {
 
-    @Autowired
-    private IBookDao bookDao;
+    private final IBookDao bookDao;
 
     @Override
     public Book saveBook(Book book) {
