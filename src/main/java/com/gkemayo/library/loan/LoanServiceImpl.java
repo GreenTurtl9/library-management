@@ -3,16 +3,17 @@ package com.gkemayo.library.loan;
 import java.time.LocalDate;
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service("loanService")
+@RequiredArgsConstructor
 @Transactional
 public class LoanServiceImpl implements ILoanService {
 
-    @Autowired
-    private ILoanDao loanDao;
+    private final ILoanDao loanDao;
 
     @Override
     public List<Loan> findAllLoansByEndDateBefore(LocalDate maxEndDate) {
@@ -43,8 +44,7 @@ public class LoanServiceImpl implements ILoanService {
     }
 
     /**
-     * On fera de la suppression logique, car le statut de l'objet Loan est positionné à
-     * CLOSE.
+     * We will do logical deletion, because the status of the Loan object is set to CLOSE.
      */
     @Override
     public void closeLoan(Loan loan) {

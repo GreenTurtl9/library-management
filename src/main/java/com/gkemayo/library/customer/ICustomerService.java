@@ -12,7 +12,7 @@ public interface ICustomerService {
 
     public void deleteCustomer(Integer customerId);
 
-    public boolean checkIfIdexists(Integer id);
+    public boolean checkIfIdExists(Integer id);
 
     public Customer findCustomerByEmail(String email);
 

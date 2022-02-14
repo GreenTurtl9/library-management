@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,20 +26,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/rest/customer/api")
 @Api(value = "Customer Rest Controller: contains all operations for managing customers")
 public class CustomerRestController {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(CustomerRestController.class);
 
-    @Autowired
-    private CustomerServiceImpl customerService;
+    private final CustomerServiceImpl customerService;
 
-    @Autowired
-    private JavaMailSender javaMailSender;
+    private final JavaMailSender javaMailSender;
 
     /**
-     * Ajoute un nouveau client dans la base de donnée H2. Si le client existe déjà, on retourne un code indiquant que la création n'a pas abouti.
+     * Adds a new customer to the H2 database. If the client already exists, a code is returned indicating that the creation was unsuccessful.
      * @param customerDTORequest
      * @return
      */
@@ -65,7 +65,7 @@ public class CustomerRestController {
     }
 
     /**
-     * Met à jour les données d'un client dans la base de donnée H2. Si le client n'est pas retrouvé, on retourne un code indiquant que la mise à jour n'a pas abouti.
+     * Updates customer data in the H2 database. If the client is not found, a code is returned indicating that the update was unsuccessful.
      * @param customerDTORequest
      * @return
      */
@@ -76,7 +76,7 @@ public class CustomerRestController {
             @ApiResponse(code = 304, message = "Not Modified: the customer is unsuccessfully updated") })
     public ResponseEntity<CustomerDTO> updateCustomer(@RequestBody CustomerDTO customerDTORequest) {
         //, UriComponentsBuilder uriComponentBuilder
-        if (!customerService.checkIfIdexists(customerDTORequest.getId())) {
+        if (!customerService.checkIfIdExists(customerDTORequest.getId())) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         Customer customerRequest = mapCustomerDTOToCustomer(customerDTORequest);
@@ -89,18 +89,24 @@ public class CustomerRestController {
     }
 
     /**
-     * Supprime un client dans la base de donnée H2. Si le client n'est pas retrouvé, on retourne le Statut HTTP NO_CONTENT.
+     * Deletes a customer in the H2 database. If the client is not found, the HTTP Status NO_CONTENT is returned.
      * @param customerId
      * @return
      */
     @DeleteMapping("/deleteCustomer/{customerId}")
     @ApiOperation(value = "Delete a customer in the Library, if the customer does not exist, nothing is done", response = String.class)
-    @ApiResponse(code = 204, message = "No Content: customer sucessfully deleted")
+    @ApiResponse(code = 204, message = "No Content: customer successfully deleted")
     public ResponseEntity<String> deleteCustomer(@PathVariable Integer customerId) {
         customerService.deleteCustomer(customerId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    /**
+     * Returns all customers in pages with begin and end page.
+     * @param beginPage
+     * @param endPage
+     * @return
+     */
     @GetMapping("/paginatedSearch")
     @ApiOperation(value="List customers of the Library in a paginated way", response = List.class)
     @ApiResponses(value = {
@@ -112,14 +118,15 @@ public class CustomerRestController {
         //, UriComponentsBuilder uriComponentBuilder
         Page<Customer> customers = customerService.getPaginatedCustomersList(beginPage, endPage);
         if (customers != null) {
-            List<CustomerDTO> customerDTOs = customers.stream().map(this::mapCustomerToCustomerDTO).collect(Collectors.toList());
+            List<CustomerDTO> customerDTOs = customers.stream().map(this::mapCustomerToCustomerDTO)
+                    .collect(Collectors.toList());
             return new ResponseEntity<>(customerDTOs, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     /**
-     * Retourne le client ayant l'adresse email passé en paramètre.
+     * Returns the customer having the email address passed in parameter.
      * @param email
      * @return
      */
@@ -140,7 +147,7 @@ public class CustomerRestController {
     }
 
     /**
-     * Retourne la liste des clients ayant le nom passé en paramètre.
+     * Returns the customer having the last name passed in parameter.
      * @param lastName
      * @return
      */
@@ -154,14 +161,16 @@ public class CustomerRestController {
         //,	UriComponentsBuilder uriComponentBuilder
         List<Customer> customers = customerService.findCustomerByLastName(lastName);
         if (customers != null && !CollectionUtils.isEmpty(customers)) {
-            List<CustomerDTO> customerDTOs = customers.stream().map(this::mapCustomerToCustomerDTO).collect(Collectors.toList());
+            List<CustomerDTO> customerDTOs = customers.stream().map(this::mapCustomerToCustomerDTO)
+                    .collect(Collectors.toList());
             return new ResponseEntity<>(customerDTOs, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     /**
-     * Envoi un mail à un client. L'objet MailDTO contient l'identifiant et l'email du client concerné, l'objet du mail et le contenu du message.
+     * Email a customer. The MailDTO object contains the identifier and the email of the customer concerned,
+     * the subject of the email and the content of the message.
      * @param loanMailDto
      * @param uriComponentBuilder
      * @return
@@ -187,7 +196,7 @@ public class CustomerRestController {
         }
 
         SimpleMailMessage mail = new SimpleMailMessage();
-        mail.setFrom(loanMailDto.MAIL_FROM);
+        mail.setFrom(MailDTO.MAIL_FROM);
         mail.setTo(customer.getEmail());
         mail.setSentDate(new Date());
         mail.setSubject(loanMailDto.getEmailSubject());
@@ -203,7 +212,7 @@ public class CustomerRestController {
     }
 
     /**
-     * Transforme un entity Customer en un POJO CustomerDTO
+     * Transform an entity Customer to a POJO CustomerDTO
      *
      * @param customer
      * @return
@@ -214,7 +223,7 @@ public class CustomerRestController {
     }
 
     /**
-     * Transforme un POJO CustomerDTO en en entity Customer
+     * Transform a POJO CustomerDTO to an entity Customer
      *
      * @param customerDTO
      * @return

@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,14 +33,14 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/rest/book/api")
 @Api(value = "Book Rest Controller: contains all operations for managing books")
 public class BookRestController {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(BookRestController.class);
 
-    @Autowired
-    private BookServiceImpl bookService;
+    private final BookServiceImpl bookService;
 
     @PostMapping("/addBook")
     @ApiOperation(value = "Add a new Book in the Library", response = BookDTO.class)
@@ -92,7 +93,7 @@ public class BookRestController {
     @GetMapping("/searchByTitle")
     @ApiOperation(value="Search Books in the Library by title", response = List.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Ok: successfull research"),
+            @ApiResponse(code = 200, message = "Ok: successful research"),
             @ApiResponse(code = 204, message = "No Content: no result founded"),
     })
     public ResponseEntity<List<BookDTO>> searchBookByTitle(@RequestParam("title") String title,
@@ -102,8 +103,8 @@ public class BookRestController {
             // on retire tous les élts null que peut contenir cette liste => pour éviter les
             // NPE par la suite
             books.removeAll(Collections.singleton(null));
-            List<BookDTO> bookDTOs = books.stream().map(this::mapBookToBookDTO
-            ).collect(Collectors.toList());
+            List<BookDTO> bookDTOs = books.stream().map(this::mapBookToBookDTO)
+                    .collect(Collectors.toList());
             return new ResponseEntity<>(bookDTOs, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -126,7 +127,7 @@ public class BookRestController {
     }
 
     /**
-     * Transforme un Book en BookDTO
+     * Transform Book to BookDTO
      *
      * @param book
      * @return
@@ -141,7 +142,7 @@ public class BookRestController {
     }
 
     /**
-     * Transforme un BookDTO en Book
+     * Transform BookDTO to Book
      *
      * @param bookDTO
      * @return

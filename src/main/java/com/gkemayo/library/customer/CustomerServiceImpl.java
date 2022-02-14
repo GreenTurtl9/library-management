@@ -32,7 +32,7 @@ public class CustomerServiceImpl implements ICustomerService {
     }
 
     @Override
-    public boolean checkIfIdexists(Integer id) {
+    public boolean checkIfIdExists(Integer id) {
         return customerDao.existsById(id);
     }
 
