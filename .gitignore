@@ -16,6 +16,12 @@
 
 *.ear
 
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+*.log
 
 
 #Executable Files
